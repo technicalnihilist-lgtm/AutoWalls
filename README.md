@@ -208,7 +208,8 @@ hand-authored vector drawables (no 10,000-icon dependency), so the app stays sma
 ### 1.0.1
 - Version bump and a fresh build (`versionCode 2`)
 - MIT licence for the app code, explicitly excluding the photographs
-- GitHub Actions workflow: builds the debug APK and renders the screenshot tests on every push
+- GitHub Actions workflow: builds the debug APK on every push and uploads it as an artifact
+  (green run: `AutoWalls-debug-apk`); the screenshot step is wired up but still experimental
 - Removed a sandbox-only test dependency; `ScreenshotTest` now uses Robolectric's own
   automatic download on a normal machine
 
@@ -219,7 +220,12 @@ hand-authored vector drawables (no 10,000-icon dependency), so the app stays sma
 ## 10. Known limitations
 
 - Runtime behaviour on a device was not exercised in this environment; the build and the API
-  contract were verified instead.
+  contract were verified instead. The APK in the release was built and inspected here, not run.
+- The `ScreenshotTest` is **experimental**: it compiles and runs in CI, but every capture still
+  ends in `ComposeTimeoutException` because Coil's asynchronous image updates keep the Compose
+  composition from ever going idle. A synchronous fake `ImageLoader` (or disabling crossfade in
+  test mode) is the missing piece. Until then the screenshots in this repo are renders of the
+  design system, not device captures.
 - The release build (R8) was not completed here because of the build sandbox's 2 GB / 2-core
   limit; the debug build and the keep rules in `app/proguard-rules.pro` are in place.
 - Verification ran with memory-constrained Gradle settings (1.4 GB heap, one worker). The
