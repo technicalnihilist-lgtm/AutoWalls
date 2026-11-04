@@ -114,10 +114,14 @@ class ScreenshotTest {
     }
 
     private fun capture(name: String, content: @androidx.compose.runtime.Composable () -> Unit) {
+        // Shimmer placeholders animate forever, so the composition never goes idle.
+        // Drive the frame clock manually instead of waiting for idle.
+        rule.mainClock.autoAdvance = false
         rule.setContent { AutoWallsTheme { content() } }
-        rule.waitForIdle()
-        Thread.sleep(120)
-        rule.waitForIdle()
+        repeat(16) {
+            rule.mainClock.advanceTimeBy(100)
+            Thread.sleep(25)   // let Coil's IO coroutines deliver the images
+        }
         val bitmap: Bitmap = rule.onRoot().captureToImage().asAndroidBitmap()
         FileOutputStream(File(outDir, "$name.png")).use {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
