@@ -1,0 +1,458 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "7fdb5c9c4ca08bcf9b64aa1d4d8190af",
+    "entities": [
+      {
+        "tableName": "favorites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wallpaperId` INTEGER NOT NULL, `addedAt` INTEGER NOT NULL, `w_id` INTEGER NOT NULL, `w_title` TEXT NOT NULL, `w_displayName` TEXT NOT NULL, `w_fullUrl` TEXT NOT NULL, `w_previewUrl` TEXT NOT NULL, `w_thumbUrl` TEXT NOT NULL, `w_width` INTEGER NOT NULL, `w_height` INTEGER NOT NULL, `w_mime` TEXT NOT NULL, `w_fileSizeBytes` INTEGER NOT NULL, `w_artist` TEXT NOT NULL, `w_credit` TEXT NOT NULL, `w_description` TEXT NOT NULL, `w_licenseName` TEXT NOT NULL, `w_licenseUrl` TEXT NOT NULL, `w_sourcePage` TEXT NOT NULL, `w_uploadedBy` TEXT, `w_dateOriginal` TEXT, `w_categoryId` TEXT NOT NULL, `w_categoryName` TEXT NOT NULL, PRIMARY KEY(`wallpaperId`))",
+        "fields": [
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaperId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedAt",
+            "columnName": "addedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.id",
+            "columnName": "w_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.title",
+            "columnName": "w_title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.displayName",
+            "columnName": "w_displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.fullUrl",
+            "columnName": "w_fullUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.previewUrl",
+            "columnName": "w_previewUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.thumbUrl",
+            "columnName": "w_thumbUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.width",
+            "columnName": "w_width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.height",
+            "columnName": "w_height",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.mime",
+            "columnName": "w_mime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.fileSizeBytes",
+            "columnName": "w_fileSizeBytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.artist",
+            "columnName": "w_artist",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.credit",
+            "columnName": "w_credit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.description",
+            "columnName": "w_description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.licenseName",
+            "columnName": "w_licenseName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.licenseUrl",
+            "columnName": "w_licenseUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.sourcePage",
+            "columnName": "w_sourcePage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.uploadedBy",
+            "columnName": "w_uploadedBy",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wallpaper.dateOriginal",
+            "columnName": "w_dateOriginal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wallpaper.categoryId",
+            "columnName": "w_categoryId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.categoryName",
+            "columnName": "w_categoryName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "wallpaperId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "downloads",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wallpaperId` INTEGER NOT NULL, `localPath` TEXT NOT NULL, `downloadedAt` INTEGER NOT NULL, `w_id` INTEGER NOT NULL, `w_title` TEXT NOT NULL, `w_displayName` TEXT NOT NULL, `w_fullUrl` TEXT NOT NULL, `w_previewUrl` TEXT NOT NULL, `w_thumbUrl` TEXT NOT NULL, `w_width` INTEGER NOT NULL, `w_height` INTEGER NOT NULL, `w_mime` TEXT NOT NULL, `w_fileSizeBytes` INTEGER NOT NULL, `w_artist` TEXT NOT NULL, `w_credit` TEXT NOT NULL, `w_description` TEXT NOT NULL, `w_licenseName` TEXT NOT NULL, `w_licenseUrl` TEXT NOT NULL, `w_sourcePage` TEXT NOT NULL, `w_uploadedBy` TEXT, `w_dateOriginal` TEXT, `w_categoryId` TEXT NOT NULL, `w_categoryName` TEXT NOT NULL, PRIMARY KEY(`wallpaperId`))",
+        "fields": [
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaperId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localPath",
+            "columnName": "localPath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadedAt",
+            "columnName": "downloadedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.id",
+            "columnName": "w_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.title",
+            "columnName": "w_title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.displayName",
+            "columnName": "w_displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.fullUrl",
+            "columnName": "w_fullUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.previewUrl",
+            "columnName": "w_previewUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.thumbUrl",
+            "columnName": "w_thumbUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.width",
+            "columnName": "w_width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.height",
+            "columnName": "w_height",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.mime",
+            "columnName": "w_mime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.fileSizeBytes",
+            "columnName": "w_fileSizeBytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.artist",
+            "columnName": "w_artist",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.credit",
+            "columnName": "w_credit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.description",
+            "columnName": "w_description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.licenseName",
+            "columnName": "w_licenseName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.licenseUrl",
+            "columnName": "w_licenseUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.sourcePage",
+            "columnName": "w_sourcePage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.uploadedBy",
+            "columnName": "w_uploadedBy",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wallpaper.dateOriginal",
+            "columnName": "w_dateOriginal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wallpaper.categoryId",
+            "columnName": "w_categoryId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.categoryName",
+            "columnName": "w_categoryName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "wallpaperId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "recents",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wallpaperId` INTEGER NOT NULL, `viewedAt` INTEGER NOT NULL, `w_id` INTEGER NOT NULL, `w_title` TEXT NOT NULL, `w_displayName` TEXT NOT NULL, `w_fullUrl` TEXT NOT NULL, `w_previewUrl` TEXT NOT NULL, `w_thumbUrl` TEXT NOT NULL, `w_width` INTEGER NOT NULL, `w_height` INTEGER NOT NULL, `w_mime` TEXT NOT NULL, `w_fileSizeBytes` INTEGER NOT NULL, `w_artist` TEXT NOT NULL, `w_credit` TEXT NOT NULL, `w_description` TEXT NOT NULL, `w_licenseName` TEXT NOT NULL, `w_licenseUrl` TEXT NOT NULL, `w_sourcePage` TEXT NOT NULL, `w_uploadedBy` TEXT, `w_dateOriginal` TEXT, `w_categoryId` TEXT NOT NULL, `w_categoryName` TEXT NOT NULL, PRIMARY KEY(`wallpaperId`))",
+        "fields": [
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaperId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "viewedAt",
+            "columnName": "viewedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.id",
+            "columnName": "w_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.title",
+            "columnName": "w_title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.displayName",
+            "columnName": "w_displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.fullUrl",
+            "columnName": "w_fullUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.previewUrl",
+            "columnName": "w_previewUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.thumbUrl",
+            "columnName": "w_thumbUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.width",
+            "columnName": "w_width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.height",
+            "columnName": "w_height",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.mime",
+            "columnName": "w_mime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.fileSizeBytes",
+            "columnName": "w_fileSizeBytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.artist",
+            "columnName": "w_artist",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.credit",
+            "columnName": "w_credit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.description",
+            "columnName": "w_description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.licenseName",
+            "columnName": "w_licenseName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.licenseUrl",
+            "columnName": "w_licenseUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.sourcePage",
+            "columnName": "w_sourcePage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.uploadedBy",
+            "columnName": "w_uploadedBy",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wallpaper.dateOriginal",
+            "columnName": "w_dateOriginal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wallpaper.categoryId",
+            "columnName": "w_categoryId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaper.categoryName",
+            "columnName": "w_categoryName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "wallpaperId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7fdb5c9c4ca08bcf9b64aa1d4d8190af')"
+    ]
+  }
+}
