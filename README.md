@@ -13,7 +13,7 @@ image carries its photographer, license name, license URL and original Commons p
 - **Images:** Coil (memory + 512 MB disk cache, descriptive User-Agent)
 - **Persistence:** Room (favourites, offline downloads, recently viewed)
 - **Wallpaper:** Android `WallpaperManager` (home / lock / both)
-- **minSdk 24 · targetSdk 35 · compileSdk 35 · version 1.0.1 (code 2)**
+- **minSdk 24 · targetSdk 35 · compileSdk 35 · version 1.0.2 (code 3)**
 
 ---
 
@@ -204,6 +204,20 @@ hand-authored vector drawables (no 10,000-icon dependency), so the app stays sma
 ---
 
 ## 9. Changelog
+
+### 1.0.2 — image display fixes
+- **Landscape photos are no longer cropped.** The detail screen shows the photograph at its
+  natural aspect ratio with `ContentScale.Fit` (letterboxed on black) instead of a full-bleed
+  `Crop`, so a wide shot is visible in full.
+- **New full-screen viewer.** Tap the photo on the detail screen to open it edge to edge;
+  pinch to zoom (up to 5×), drag to pan, double-tap to zoom or reset. It is `Fit`-based and
+  works in landscape.
+- **Faster loading.** The home feed now publishes each rail the moment it arrives instead of
+  blocking on the slowest request; thumbnails for the first 8 items of every rail are
+  prefetched into the Coil disk cache; the detail screen shows the already-cached thumbnail
+  instantly while the full preview streams in; crossfade cut from 280 ms to 120 ms and the
+  image client now allows 12 parallel requests per host.
+- Detail screen restructured: image on top, actions and credits below, fixed top bar.
 
 ### 1.0.1
 - Version bump and a fresh build (`versionCode 2`)

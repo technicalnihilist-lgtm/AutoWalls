@@ -3,6 +3,9 @@ package com.autowalls.app.ui.screens.detail
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,7 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,7 +35,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,8 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.autowalls.app.R
 import com.autowalls.app.data.download.DownloadState
+import com.autowalls.app.domain.model.Wallpaper
 import com.autowalls.app.ui.components.AttributionBlock
 import com.autowalls.app.ui.components.ErrorState
+import com.autowalls.app.ui.components.FullscreenImageViewer
 import com.autowalls.app.ui.components.GlassSurface
 import com.autowalls.app.ui.components.LicenseBadge
 import com.autowalls.app.ui.components.ShimmerBlock
@@ -73,6 +81,7 @@ fun DetailScreen(
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    var fullscreen by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.message) {
         val message = state.message
@@ -82,41 +91,197 @@ fun DetailScreen(
         }
     }
 
+    val wallpaper = state.wallpaper
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(AutoWallsColors.Black)
     ) {
-        val wallpaper = state.wallpaper
-
-        if (wallpaper != null) {
-            WallpaperImage(
-                url = wallpaper.previewUrl,
-                contentDescription = wallpaper.displayName,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+        when {
+            wallpaper == null && state.loading -> ShimmerBlock(
+                Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(0.dp)
             )
-        } else if (state.loading) {
-            ShimmerBlock(Modifier.fillMaxSize(), shape = RoundedCornerShape(0.dp))
+
+            wallpaper == null && state.error != null -> Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                GlassSurface(shape = RoundedCornerShape(20.dp)) {
+                    ErrorState(message = state.error, onRetry = onRetry)
+                }
+            }
+
+            wallpaper != null -> Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 28.dp)
+            ) {
+                // The whole photograph, never cropped — landscape shots stay landscape.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(heroAspectRatio(wallpaper))
+                        .background(Color.Black)
+                        .clickable { fullscreen = true }
+                ) {
+                    WallpaperImage(
+                        url = wallpaper.previewUrl,
+                        contentDescription = wallpaper.displayName,
+                        contentScale = ContentScale.Fit,
+                        placeholderUrl = wallpaper.thumbUrl,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    ExpandHint(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(12.dp)
+                    )
+                }
+
+                Column(Modifier.padding(horizontal = 20.dp)) {
+                    Spacer(Modifier.height(18.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = wallpaper.categoryName.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AutoWallsColors.Champagne
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        LicenseBadge(licenseName = wallpaper.licenseName)
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Text(
+                        text = wallpaper.displayName,
+                        style = MaterialTheme.typography.displayMedium,
+                        color = AutoWallsColors.TextPrimary,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Text(
+                        text = "Photograph by ${wallpaper.artist} · Wikimedia Commons",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AutoWallsColors.TextSecondary
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MetaPill("${wallpaper.resolution} px")
+                        MetaPill(wallpaper.megapixels)
+                        MetaPill(Formatters.fileSize(wallpaper.fileSizeBytes))
+                    }
+
+                    Spacer(Modifier.height(20.dp))
+
+                    DownloadButton(state = state, onDownload = onDownload)
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        text = "SET AS WALLPAPER",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AutoWallsColors.TextTertiary
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ActionChip(
+                            icon = painterResource(R.drawable.ic_smartphone),
+                            label = "Home",
+                            busy = state.applying == WallpaperSetter.Target.HOME,
+                            enabled = state.applying == null,
+                            onClick = { onSetWallpaper(WallpaperSetter.Target.HOME) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        ActionChip(
+                            icon = painterResource(R.drawable.ic_lock),
+                            label = "Lock",
+                            busy = state.applying == WallpaperSetter.Target.LOCK,
+                            enabled = state.applying == null,
+                            onClick = { onSetWallpaper(WallpaperSetter.Target.LOCK) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        ActionChip(
+                            icon = painterResource(R.drawable.ic_phone_android),
+                            label = "Both",
+                            busy = state.applying == WallpaperSetter.Target.BOTH,
+                            enabled = state.applying == null,
+                            onClick = { onSetWallpaper(WallpaperSetter.Target.BOTH) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ActionChip(
+                            icon = painterResource(R.drawable.ic_wallpaper),
+                            label = if (state.savingToGallery) "Saving…" else "Save to gallery",
+                            busy = state.savingToGallery,
+                            enabled = !state.savingToGallery,
+                            onClick = onSaveToGallery,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ActionChip(
+                            icon = painterResource(R.drawable.ic_content_copy),
+                            label = "Copy credit",
+                            busy = false,
+                            enabled = true,
+                            onClick = onCopyAttribution,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(Modifier.height(22.dp))
+
+                    GlassSurface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        AttributionBlock(
+                            wallpaper = wallpaper,
+                            modifier = Modifier.padding(16.dp),
+                            onOpenSource = { openUrl(context, wallpaper.sourcePage) },
+                            onOpenLicense = { openUrl(context, wallpaper.licenseUrl) }
+                        )
+                    }
+
+                    if (wallpaper.description.isNotBlank()) {
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            text = "ABOUT THIS IMAGE",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AutoWallsColors.TextTertiary
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = wallpaper.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AutoWallsColors.TextSecondary
+                        )
+                    }
+                }
+            }
         }
 
-        // Cinematic scrim so type stays legible over any photograph.
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        0f to Color(0xB3000000),
-                        0.22f to Color(0x1A000000),
-                        0.55f to Color(0x99000000),
-                        1f to Color(0xFA000000)
-                    )
-                )
-        )
-
+        // Fixed top bar so the controls stay reachable while the page scrolls.
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xCC000000), Color(0x00000000))
+                    )
+                )
                 .statusBarsPadding()
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -152,154 +317,18 @@ fun DetailScreen(
             }
         }
 
-        if (state.error != null && wallpaper == null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                GlassSurface(shape = RoundedCornerShape(20.dp)) {
-                    ErrorState(message = state.error, onRetry = onRetry)
-                }
-            }
-        }
-
-        if (wallpaper != null) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.76f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 20.dp, bottom = 28.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = wallpaper.categoryName.uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = AutoWallsColors.Champagne
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    LicenseBadge(licenseName = wallpaper.licenseName)
-                }
-
-                Spacer(Modifier.height(10.dp))
-
-                Text(
-                    text = wallpaper.displayName,
-                    style = MaterialTheme.typography.displayMedium,
-                    color = AutoWallsColors.TextPrimary,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+        AnimatedVisibility(
+            visible = fullscreen && wallpaper != null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            if (wallpaper != null) {
+                FullscreenImageViewer(
+                    url = wallpaper.previewUrl,
+                    contentDescription = wallpaper.displayName,
+                    placeholderUrl = wallpaper.thumbUrl,
+                    onClose = { fullscreen = false }
                 )
-
-                Spacer(Modifier.height(8.dp))
-
-                Text(
-                    text = "Photograph by ${wallpaper.artist} · Wikimedia Commons",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AutoWallsColors.TextSecondary
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    MetaPill("${wallpaper.resolution} px")
-                    MetaPill(wallpaper.megapixels)
-                    MetaPill(Formatters.fileSize(wallpaper.fileSizeBytes))
-                }
-
-                Spacer(Modifier.height(20.dp))
-
-                DownloadButton(state = state, onDownload = onDownload)
-
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    text = "SET AS WALLPAPER",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AutoWallsColors.TextTertiary
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ActionChip(
-                        icon = painterResource(R.drawable.ic_smartphone),
-                        label = "Home",
-                        busy = state.applying == WallpaperSetter.Target.HOME,
-                        enabled = state.applying == null,
-                        onClick = { onSetWallpaper(WallpaperSetter.Target.HOME) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ActionChip(
-                        icon = painterResource(R.drawable.ic_lock),
-                        label = "Lock",
-                        busy = state.applying == WallpaperSetter.Target.LOCK,
-                        enabled = state.applying == null,
-                        onClick = { onSetWallpaper(WallpaperSetter.Target.LOCK) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ActionChip(
-                        icon = painterResource(R.drawable.ic_phone_android),
-                        label = "Both",
-                        busy = state.applying == WallpaperSetter.Target.BOTH,
-                        enabled = state.applying == null,
-                        onClick = { onSetWallpaper(WallpaperSetter.Target.BOTH) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ActionChip(
-                        icon = painterResource(R.drawable.ic_wallpaper),
-                        label = if (state.savingToGallery) "Saving…" else "Save to gallery",
-                        busy = state.savingToGallery,
-                        enabled = !state.savingToGallery,
-                        onClick = onSaveToGallery,
-                        modifier = Modifier.weight(1f)
-                    )
-                    ActionChip(
-                        icon = painterResource(R.drawable.ic_content_copy),
-                        label = "Copy credit",
-                        busy = false,
-                        enabled = true,
-                        onClick = onCopyAttribution,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(Modifier.height(22.dp))
-
-                GlassSurface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp)
-                ) {
-                    AttributionBlock(
-                        wallpaper = wallpaper,
-                        modifier = Modifier.padding(16.dp),
-                        onOpenSource = { openUrl(context, wallpaper.sourcePage) },
-                        onOpenLicense = { openUrl(context, wallpaper.licenseUrl) }
-                    )
-                }
-
-                if (wallpaper.description.isNotBlank()) {
-                    Spacer(Modifier.height(16.dp))
-                    Text(
-                        text = "ABOUT THIS IMAGE",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = AutoWallsColors.TextTertiary
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = wallpaper.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = AutoWallsColors.TextSecondary
-                    )
-                }
-
-                Spacer(Modifier.height(24.dp))
             }
         }
 
@@ -308,6 +337,40 @@ fun DetailScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
+        )
+    }
+}
+
+/**
+ * Natural aspect ratio of the photograph, clamped so an extreme panorama or a very
+ * tall shot still leaves room for the controls on the next screen.
+ */
+private fun heroAspectRatio(wallpaper: Wallpaper): Float =
+    wallpaper.aspectRatio.coerceIn(0.66f, 2.4f)
+
+@Composable
+private fun ExpandHint(modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(50)
+    Row(
+        modifier = modifier
+            .clip(shape)
+            .background(Color(0xB3000000))
+            .border(1.dp, AutoWallsColors.GlassBorder, shape)
+            .padding(horizontal = 12.dp, vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_wallpaper),
+            contentDescription = null,
+            tint = AutoWallsColors.TextPrimary,
+            modifier = Modifier.size(13.dp)
+        )
+        Spacer(Modifier.width(6.dp))
+        Text(
+            text = "Full screen",
+            style = MaterialTheme.typography.labelMedium,
+            color = AutoWallsColors.TextPrimary,
+            fontSize = 10.sp
         )
     }
 }

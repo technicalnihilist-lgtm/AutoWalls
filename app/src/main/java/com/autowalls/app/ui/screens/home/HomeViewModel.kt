@@ -10,7 +10,11 @@ import com.autowalls.app.domain.model.Wallpaper
 import com.autowalls.app.ui.WallpaperCache
 import com.autowalls.app.util.ErrorMapper
 import com.autowalls.app.util.NetworkUtils
+import coil.Coil
+import coil.request.ImageRequest
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -101,16 +105,51 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
-            _uiState.update {
-                it.copy(
-                    featured = featured.await().toSection(online),
-                    trending = trending.await().toSection(online),
-                    latest = latest.await().toSection(online),
-                    motorcycles = motorcycles.await().toSection(online),
-                    luxury = luxury.await().toSection(online),
-                    refreshing = false
-                )
+            // Publish each rail the moment it arrives instead of waiting for the
+            // slowest one — the first images appear in well under a second.
+            coroutineScope {
+                launch {
+                    val section = featured.await().toSection(online)
+                    _uiState.update { it.copy(featured = section) }
+                    prefetch(section.items)
+                }
+                launch {
+                    val section = trending.await().toSection(online)
+                    _uiState.update { it.copy(trending = section) }
+                    prefetch(section.items)
+                }
+                launch {
+                    val section = latest.await().toSection(online)
+                    _uiState.update { it.copy(latest = section) }
+                    prefetch(section.items)
+                }
+                launch {
+                    val section = motorcycles.await().toSection(online)
+                    _uiState.update { it.copy(motorcycles = section) }
+                    prefetch(section.items)
+                }
+                launch {
+                    val section = luxury.await().toSection(online)
+                    _uiState.update { it.copy(luxury = section) }
+                    prefetch(section.items)
+                }
             }
+            _uiState.update { it.copy(refreshing = false) }
+        }
+    }
+
+    /** Warms the Coil disk cache so scrolling into a rail is instant. */
+    private fun prefetch(items: List<Wallpaper>) {
+        if (items.isEmpty()) return
+        val context = getApplication<Application>()
+        val loader = Coil.imageLoader(context)
+        items.take(PREFETCH_PER_RAIL).forEach { wallpaper ->
+            loader.enqueue(
+                ImageRequest.Builder(context)
+                    .data(wallpaper.thumbUrl)
+                    .size(640, 640)
+                    .build()
+            )
         }
     }
 
@@ -128,5 +167,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleFavorite(wallpaper: Wallpaper) {
         viewModelScope.launch { repository.toggleFavorite(wallpaper) }
+    }
+
+    private companion object {
+        const val PREFETCH_PER_RAIL = 8
     }
 }

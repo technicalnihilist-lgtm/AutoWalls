@@ -29,6 +29,7 @@ class AutoWallsApplication : Application(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
         .okHttpClient {
             OkHttpClient.Builder()
+                .dispatcher(okhttp3.Dispatcher().apply { maxRequestsPerHost = 12 })
                 .addInterceptor { chain ->
                     chain.proceed(
                         chain.request().newBuilder()
@@ -49,7 +50,7 @@ class AutoWallsApplication : Application(), ImageLoaderFactory {
                 .maxSizeBytes(512L * 1024L * 1024L)
                 .build()
         }
-        .crossfade(280)
+        .crossfade(120)
         .respectCacheHeaders(false)
         .build()
 

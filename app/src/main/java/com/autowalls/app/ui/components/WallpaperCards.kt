@@ -51,7 +51,9 @@ fun WallpaperImage(
     url: String,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Crop
+    contentScale: ContentScale = ContentScale.Crop,
+    /** Already-cached smaller image shown instantly while [url] streams in. */
+    placeholderUrl: String? = null
 ) {
     val context = LocalContext.current
     var loaded by remember(url) { mutableStateOf(false) }
@@ -63,7 +65,8 @@ fun WallpaperImage(
         AsyncImage(
             model = ImageRequest.Builder(context)
                 .data(url)
-                .crossfade(300)
+                .apply { if (placeholderUrl != null) placeholderMemoryCacheKey(placeholderUrl) }
+                .crossfade(120)
                 .build(),
             contentDescription = contentDescription,
             contentScale = contentScale,
