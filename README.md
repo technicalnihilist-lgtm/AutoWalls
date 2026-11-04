@@ -42,8 +42,10 @@ image carries its photographer, license name, license URL and original Commons p
 Requires JDK 17 and the Android SDK (platform 35 + build-tools 35). The Gradle wrapper (8.9)
 is included.
 
-A prebuilt, installable debug APK is published in [Releases](../../releases) and kept in
-[`dist/`](dist/) (`AutoWalls-debug.apk`, package `com.autowalls.app.debug`).
+[![Download APK](https://img.shields.io/badge/Download-AutoWalls--debug.apk-C8A96A?style=flat-square)](https://github.com/technicalnihilist-lgtm/AutoWalls/releases/latest/download/AutoWalls-debug.apk)
+
+The installable debug APK (`com.autowalls.app.debug`, 11 MB, minSdk 24) is attached to the
+[latest release](https://github.com/technicalnihilist-lgtm/AutoWalls/releases/latest).
 
 ---
 
