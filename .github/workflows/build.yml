@@ -18,14 +18,20 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # The runner image already ships the Android SDK; just make sure the
+      # platform and build-tools this project targets are present.
+      - name: Ensure Android SDK packages
+        run: |
+          SDKMGR="$(find "${ANDROID_HOME}" -name sdkmanager -type f | head -1)"
+          echo "sdkmanager: $SDKMGR"
+          yes | "$SDKMGR" --licenses > /dev/null 2>&1 || true
+          "$SDKMGR" "platforms;android-35" "build-tools;35.0.0" > /dev/null 2>&1 || true
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Render screenshots from the real Compose screens
-        run: ./gradlew :app:testDebugUnitTest --tests "*ScreenshotTest*" --no-daemon
+        run: ./gradlew :app:testDebugUnitTest --tests "*ScreenshotTest*" --no-daemon --stacktrace
         continue-on-error: true
 
       - name: Upload APK
