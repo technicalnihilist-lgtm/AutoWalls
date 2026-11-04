@@ -13,8 +13,8 @@ android {
         applicationId = "com.autowalls.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -92,7 +92,6 @@ dependencies {
     testImplementation("androidx.test:core-ktx:1.6.1")
     testImplementation(platform(libs.androidx.compose.bom))
     testImplementation("androidx.compose.ui:ui-test-junit4")
-    testImplementation("org.robolectric:nativeruntime-dist-compat:1.0.20")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 

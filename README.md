@@ -1,5 +1,8 @@
 # AutoWalls — Premium Vehicle Wallpapers (Android)
 
+[![Build APK](https://github.com/technicalnihilist-lgtm/AutoWalls/actions/workflows/build.yml/badge.svg)](https://github.com/technicalnihilist-lgtm/AutoWalls/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/technicalnihilist-lgtm/AutoWalls?color=C8A96A&label=release)](https://github.com/technicalnihilist-lgtm/AutoWalls/releases/latest)
+
 A complete Android wallpaper app for automotive photography. Every image is fetched **live**
 from the Wikimedia Commons API at runtime — nothing is bundled, seeded or faked — and every
 image carries its photographer, license name, license URL and original Commons page.
@@ -10,7 +13,7 @@ image carries its photographer, license name, license URL and original Commons p
 - **Images:** Coil (memory + 512 MB disk cache, descriptive User-Agent)
 - **Persistence:** Room (favourites, offline downloads, recently viewed)
 - **Wallpaper:** Android `WallpaperManager` (home / lock / both)
-- **minSdk 24 · targetSdk 35 · compileSdk 35**
+- **minSdk 24 · targetSdk 35 · compileSdk 35 · version 1.0.1 (code 2)**
 
 ---
 
@@ -28,7 +31,8 @@ image carries its photographer, license name, license URL and original Commons p
 > photography) produced in a build sandbox without an emulator — not device captures.
 > To generate true device screenshots, run `./gradlew :app:testDebugUnitTest` — the
 > `ScreenshotTest` renders the real Compose screens with Robolectric and writes PNGs to
-> `app/build/screenshots/`. Photo credits for the images above: [screenshots/CREDITS.md](screenshots/CREDITS.md).
+> `app/build/screenshots/`. The GitHub Action does this on every push and uploads them as
+> the `screenshots` artifact. Photo credits: [screenshots/CREDITS.md](screenshots/CREDITS.md).
 
 ## 1. Build & run
 
@@ -199,7 +203,20 @@ hand-authored vector drawables (no 10,000-icon dependency), so the app stays sma
 
 ---
 
-## 9. Known limitations
+## 9. Changelog
+
+### 1.0.1
+- Version bump and a fresh build (`versionCode 2`)
+- MIT licence for the app code, explicitly excluding the photographs
+- GitHub Actions workflow: builds the debug APK and renders the screenshot tests on every push
+- Removed a sandbox-only test dependency; `ScreenshotTest` now uses Robolectric's own
+  automatic download on a normal machine
+
+### 1.0.0
+- First public build: live Wikimedia Commons feed, 42 categories, licence gate, downloads,
+  favourites, offline library, credits screen
+
+## 10. Known limitations
 
 - Runtime behaviour on a device was not exercised in this environment; the build and the API
   contract were verified instead.
