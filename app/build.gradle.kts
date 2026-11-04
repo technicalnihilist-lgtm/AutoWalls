@@ -43,6 +43,13 @@ android {
         compose = true
     }
 
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -79,4 +86,29 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.coil.compose)
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("androidx.test:core-ktx:1.6.1")
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("org.robolectric:nativeruntime-dist-compat:1.0.20")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+// Screenshot tests render the real Compose screens headlessly (Robolectric native graphics).
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "1g"
+    systemProperty("robolectric.graphicsMode", "NATIVE")
+    listOf(
+        "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort",
+        "http.proxyUser", "http.proxyPassword", "https.proxyUser", "https.proxyPassword",
+        "javax.net.ssl.trustStore", "javax.net.ssl.trustStorePassword"
+    ).forEach { key -> System.getProperty(key)?.let { systemProperty(key, it) } }
+
+    // Optional: point Robolectric at a pre-fetched android-all jar (offline / CI builds).
+    providers.gradleProperty("robolectricDependencyDir").orNull?.let { dir ->
+        systemProperty("robolectric.offline", "true")
+        systemProperty("robolectric.dependency.dir", dir)
+    }
 }

@@ -14,6 +14,22 @@ image carries its photographer, license name, license URL and original Commons p
 
 ---
 
+## Screenshots
+
+| Home | Wallpaper detail | Search |
+|---|---|---|
+| ![Home](screenshots/01-home.jpg) | ![Detail](screenshots/02-detail.jpg) | ![Search](screenshots/03-search.jpg) |
+
+| Category grid | Saved / offline | Credits & licensing |
+|---|---|---|
+| ![Category](screenshots/04-category.jpg) | ![Saved](screenshots/05-saved.jpg) | ![Credits](screenshots/06-credits.jpg) |
+
+> These are renders of the app's design system (same tokens, layout and real Commons
+> photography) produced in a build sandbox without an emulator — not device captures.
+> To generate true device screenshots, run `./gradlew :app:testDebugUnitTest` — the
+> `ScreenshotTest` renders the real Compose screens with Robolectric and writes PNGs to
+> `app/build/screenshots/`. Photo credits for the images above: [screenshots/CREDITS.md](screenshots/CREDITS.md).
+
 ## 1. Build & run
 
 ```bash
@@ -26,8 +42,8 @@ image carries its photographer, license name, license URL and original Commons p
 Requires JDK 17 and the Android SDK (platform 35 + build-tools 35). The Gradle wrapper (8.9)
 is included.
 
-A prebuilt, installable debug APK is included alongside this source
-(`AutoWalls-debug.apk`, package `com.autowalls.app.debug`).
+A prebuilt, installable debug APK is published in [Releases](../../releases) and kept in
+[`dist/`](dist/) (`AutoWalls-debug.apk`, package `com.autowalls.app.debug`).
 
 ---
 
