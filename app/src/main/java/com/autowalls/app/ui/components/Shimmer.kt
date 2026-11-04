@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import com.autowalls.app.ui.theme.AutoWallsColors
 
@@ -21,6 +22,17 @@ fun ShimmerBlock(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(14.dp)
 ) {
+    if (LocalInspectionMode.current) {
+        // Previews and screenshot tests: an infinite transition never lets the
+        // composition go idle, so render a static placeholder instead.
+        Box(
+            modifier = modifier
+                .clip(shape)
+                .background(AutoWallsColors.TextPrimary.copy(alpha = 0.08f))
+        )
+        return
+    }
+
     val transition = rememberInfiniteTransition(label = "shimmer")
     val alpha by transition.animateFloat(
         initialValue = 0.05f,
